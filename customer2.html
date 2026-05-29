@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Mode - Sari Click</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="customer-page">
+    <nav class="top-nav">
+        <button class="back-btn" onclick="location.href='index.html'">← Back</button>
+        <h1>Customer Mode</h1>
+        <div id="cart-badge" class="cart-btn">Cart: 0 items</div>
+    </nav>
+
+    <main class="container">
+        <section class="card-panel main-panel">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                <h2>Available Products</h2>
+                <input type="text" id="customer-search" placeholder="Search..." onkeyup="render()" style="width: 150px;">
+            </div>
+            
+            <div class="filter-chips" style="margin-bottom: 15px; display: flex; gap: 8px;">
+                <button class="chip-btn active" onclick="filterCustomer('All')">All</button>
+                <button class="chip-btn" onclick="filterCustomer('Instant Noodles')">Noodles</button>
+                <button class="chip-btn" onclick="filterCustomer('Drinks')">Drinks</button>
+                <button class="chip-btn" onclick="filterCustomer('Snacks')">Snacks</button>
+                <button class="chip-btn" onclick="filterCustomer('Personal Care')">Personal Care</button>
+                <button class="chip-btn" onclick="filterCustomer('Household')">Household</button>
+                <button class="chip-btn" onclick="filterCustomer('Others')">Others</button>
+            </div>
+
+            <div id="customer-list" class="list-container"></div>
+        </section>
+
+        <section class="card-panel side-panel">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+        <h2>Your Cart</h2>
+        <button id="clear-cart-btn" class="hidden" onclick="clearCart()" style="background: #dc3545; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer; font-size: 12px; font-weight: bold;">Clear All</button>
+    </div>
+    
+    <div id="cart-items" class="list-container"></div>
+    <button id="checkout-btn" class="btn-green hidden" onclick="showReceipt()">Checkout</button>
+</section>
+    </main>
+
+    <div id="receipt-modal" class="modal hidden">
+        <div class="receipt-content" id="printable-receipt"> 
+            <h2>🧾 Order Receipt</h2>
+            <hr>
+            <!-- Reference ID element inserted right here -->
+            <p style="text-align: center; font-family: monospace; margin: 5px 0;">
+                <strong>Ref ID:</strong> <span id="receipt-ref-id" style="color: #555;"></span>
+            </p>
+            <hr style="border-top: 1px dashed #ccc;">
+            <div id="receipt-details"></div>
+            <hr>
+            <div class="modal-buttons" style="display: flex; gap: 10px; margin-top: 15px;">
+                <button onclick="window.print()" class="btn-green" style="flex: 1;">Print Receipt</button>
+                <button onclick="continueShopping()" class="btn-pink" style="flex: 1; background: #ffa9e2; color: black; border: none; border-radius: 10px; font-weight: bold; cursor: pointer;">+ Add More Items</button>
+                <button onclick="closeReceipt()" class="btn-blue" style="flex: 1; margin-top: 0;">Done</button>
+            </div>
+        </div>
+    </div>
+</body>
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+<script src="firebase-config.js"></script>
+<script src="customer2.js"></script>
+</html>

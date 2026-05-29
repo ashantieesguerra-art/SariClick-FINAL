@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vendor Mode -Sari Click</title>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+
+    <script src="firebase-config.js"></script>
+
+    <link rel="stylesheet" href="style.css">
+    
+    <style>
+        /* Small style for the logout button to keep it clean */
+        .logout-btn {
+            background: transparent;
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            padding: 6px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: 0.3s;
+        }
+        .logout-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: white;
+        }
+        .nav-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+    </style>
+</head>
+
+<body class="vendor-page">
+
+    <nav class="top-nav">
+        <div class="nav-content">
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <button class="back-btn" onclick="location.href='index.html'">← Back</button>
+                <h1>Vendor Mode</h1>
+            </div>
+            <button onclick="logout()" class="logout-btn">Logout</button>
+        </div>
+    </nav>
+
+    <main class="container">
+
+        <section class="card-panel">
+            <h2>Add Product</h2>
+            <form id="product-form">
+                <div class="row">
+                    <div style="flex: 2;">
+                        <label>Product Name</label>
+                        <input type="text" id="p-name" placeholder="e.g. Chippy BBQ" required>
+                    </div>
+                    <div style="flex: 1;">
+                        <label>Price (₱)</label>
+                        <input type="number" id="p-price" step="0.01" value="0" required>
+                    </div>
+                    <div style="flex: 1;">
+                        <label>Qty</label>
+                        <input type="number" id="p-qty" value="0" required>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div style="flex: 1;">
+                        <label>Category</label>
+                        <select id="p-category">
+                            <option value="Instant Noodles">Instant Noodles</option>
+                            <option value="Drinks">Drinks</option>
+                            <option value="Snacks">Snacks</option>
+                            <option value="Condiments">Condiments</option>
+                            <option value="Personal Care">Personal Care</option>
+                            <option value="Household">Household</option>
+                            <option value="Others">Others</option>
+                        </select>
+                    </div>
+                    <div style="flex: 1;">
+                        <label>Low Stock Alert (qty)</label>
+                        <input type="number" id="p-alert" value="5">
+                    </div>
+                </div>
+                <div style="display: flex; gap: 10px; margin-top: 10px;">
+                    <button type="submit" class="btn-blue" style="flex: 1;">+ Add to Listing</button>
+                    <button type="button" class="btn-blue" onclick="location.href='vendor-custom-rns2.html'" style="background: #90b3fa; color: black; flex: 1;">
+                        📊 View Sales Report
+                    </button>
+                </div>
+            </form>
+        </section>
+
+        <section class="card-panel">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 10px;">
+                <h2>My Products (<span id="count">0</span>)</h2>
+                <div style="display: flex; gap: 10px;">
+                    <select id="sort-order" onchange="updateList()" style="padding: 5px; border-radius: 5px; border: 1px solid #ddd;">
+                        <option value="name">Sort by Name</option>
+                        <option value="low-stock">Sort by Lowest Stock</option>
+                        <option value="price-high">Price: High to Low</option>
+                    </select>
+                    <input type="text" id="vendor-search" placeholder="Search..." onkeyup="updateList()" style="width: 200px;">
+                </div>
+            </div>
+
+            <div class="filter-chips" style="margin-bottom: 15px; display: flex; gap: 8px; overflow-x: auto; padding-bottom: 5px;">
+                <button class="chip-btn active" onclick="filterBy('All')">All</button>
+                <button class="chip-btn" onclick="filterBy('Instant Noodles')">Instant Noodles</button>
+                <button class="chip-btn" onclick="filterBy('Drinks')">Drinks</button>
+                <button class="chip-btn" onclick="filterBy('Snacks')">Snacks</button>
+                <button class="chip-btn" onclick="filterBy('Condiments')">Condiments</button>
+                <button class="chip-btn" onclick="filterBy('Personal Care')">Personal Care</button>
+                <button class="chip-btn" onclick="filterBy('Household')">Household</button>
+                <button class="chip-btn" onclick="filterBy('Others')">Others</button>
+            </div>
+
+            <div id="product-list" class="list-container"></div>
+        </section>
+    </main>
+
+    <script src="vendor2.js"></script>
+    
+    <script>
+        // Inline Logout logic to make sure the button works immediately
+        window.logout = function() {
+            if(confirm("Are you sure you want to logout?")) {
+                sessionStorage.removeItem('vendorLoggedIn');
+                window.location.href = 'login.html';
+            }
+        };
+    </script>
+</body>
+</html>

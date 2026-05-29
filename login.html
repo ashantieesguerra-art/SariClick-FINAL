@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>SariClick Vendor Login</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .login-box {
+            max-width: 350px;
+            margin: 100px auto;
+            padding: 30px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        input {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0; /* Slightly reduced margin to keep it compact */
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            box-sizing: border-box; /* Prevents input fields from stretching out of the box */
+        }
+        .btn-login {
+            background: #90b3fa;
+            color: black;
+            border: none;
+            padding: 12px 20px;
+            width: 100%;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+        /* Style for the error message display */
+        .error-msg {
+            color: #dc3545;
+            font-size: 14px;
+            font-weight: bold;
+            margin-top: 15px;
+            min-height: 20px;
+        }
+    </style>
+</head>
+<body style="background: #f4f7fe;">
+    <div class="login-box">
+        <img src="https://cdn-icons-png.flaticon.com/512/607/607452.png" width="60">
+        <h2>Vendor Access</h2>
+        <p>Please enter your credentials</p>
+        
+        <input type="text" id="vendor-username" placeholder="Username (e.g., vendor001)">
+        <input type="password" id="vendor-password" placeholder="Password">
+        
+        <button class="btn-login" onclick="checkLogin()">Login to Dashboard</button>
+        
+        <div id="error-display" class="error-msg"></div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+
+    <script src="firebase-config.js"></script>
+
+    <script>
+        function checkLogin() {
+            const username = document.getElementById('vendor-username').value.trim();
+            const password = document.getElementById('vendor-password').value;
+            const errorDisplay = document.getElementById('error-display');
+            
+            // Clear previous errors
+            errorDisplay.innerText = "";
+
+            if (!username || !password) {
+                errorDisplay.innerText = "Please fill in all fields.";
+                return;
+            }
+
+            // Convert the plain username to the email format Firebase expects
+            const formattedEmail = `${username}@sariclick.com`;
+
+            // Firebase authentication call
+            firebase.auth().signInWithEmailAndPassword(formattedEmail, password)
+                .then((userCredential) => {
+                    // Set session token so vendor dashboards let you pass
+                    sessionStorage.setItem('vendorLoggedIn', 'true');
+                    window.location.href = 'vendor2.html';
+                })
+                .catch((error) => {
+                    console.error("Login Error:", error.message);
+                    errorDisplay.innerText = "Invalid username or password!";
+                });
+        }
+    </script>
+</body>
+</html>

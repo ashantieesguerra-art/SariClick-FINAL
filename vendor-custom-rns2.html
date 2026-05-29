@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Vendor Sales - Sari Click</title>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script src="firebase-config.js"></script>
+    
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="customer-page">
+    <nav class="top-nav">
+        <button class="back-btn" onclick="handleBackRoute()">← Back</button>
+        <h1>Store Revenue & Orders</h1>
+    </nav>
+
+    <main class="analytics-container">
+        
+        <div class="metrics-grid">
+            <div class="metric-card revenue-box">
+                <p style="font-weight: bold; color: #555;">Total Sales</p>
+                <h1 id="revenue-total">₱0.00</h1>
+            </div>
+            <div class="metric-card orders-box">
+                <p style="font-weight: bold; color: #555;">Total Orders</p>
+                <h2 id="order-count">0</h2>
+            </div>
+        </div>
+
+        <section class="card-panel chart-box">
+            <h2 style="margin-bottom: 15px;">Best Selling Products</h2>
+            <div class="chart-wrapper">
+                <canvas id="salesChart"></canvas>
+            </div>
+        </section>
+
+        <section class="card-panel history-box">
+            <h2 style="margin-bottom: 15px;">Recent Order History</h2>
+            <div id="order-list" class="list-container">
+                <p style="text-align:center;">Connecting to cloud...</p>
+            </div>
+        </section>
+
+    </main>
+
+    <script>
+        const STORE_ID = 'store_001';
+        let salesChart = null; 
+
+        window.handleBackRoute = function() {
+            const previousPage = sessionStorage.getItem('referrer');
+            if (previousPage === 'admin.html') {
+                sessionStorage.removeItem('referrer'); 
+                window.location.href = 'admin.html';
+            } else {
+                window.location.href = 'vendor2.html'; 
+            }
+        };
+
+        database.ref(`stores/${STORE_ID}/orders`).on('value', (snapshot) => {
+            const ordersData = snapshot.val();
+            const list = document.getElementById('order-list');
+            let totalRev = 0;
+            let orderCount = 0;
+            
+            const itemSalesCount = {};
+
+            if (ordersData) {
+                const ordersArray = Object.keys(ordersData).map(key => ordersData[key]);
+                orderCount = ordersArray.length;
+
+                list.innerHTML = ordersArray.slice().reverse().map(order => {
+                    totalRev += parseFloat(order.totalAmount);
+                    
+                    const refId = order.referenceId || "N/A";
+
+                    order.items.forEach(itemName => {
+                        itemSalesCount[itemName] = (itemSalesCount[itemName] || 0) + 1;
+                    });
+
+                    return `
+                        <div class="product-item" style="border-bottom: 1px solid #eee; padding: 15px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;">
+                            <div style="flex: 1;">
+                                <span style="font-family: monospace; font-weight: bold; font-size: 13px; color: #90b3fa; background: #f0f4fe; padding: 2px 6px; border-radius: 4px;"># ${refId}</span><br>
+                                <strong style="color: #333; display: inline-block; margin-top: 5px;">${order.items.join(', ')}</strong><br>
+                                <small style="color: #888;">${order.date}</small>
+                            </div>
+                            <div style="text-align: right;">
+                                <strong style="color: #00a844; font-size: 1.1rem;">₱${parseFloat(order.totalAmount).toFixed(2)}</strong>
+                                <br><small style="color: #aaa;">Paid</small>
+                            </div>
+                        </div>`;
+                }).join('');
+
+                updateSalesChart(itemSalesCount);
+
+            } else {
+                list.innerHTML = `
+                    <div style="text-align:center; padding: 40px; color: #999;">
+                        <img src="https://cdn-icons-png.flaticon.com/512/5089/5089733.png" width="80" style="opacity: 0.5; margin-bottom: 15px;">
+                        <p>No sales recorded yet.</p>
+                        <small>Orders will appear here once customers checkout.</small>
+                    </div>`;
+            }
+
+            document.getElementById('revenue-total').innerText = `₱${totalRev.toFixed(2)}`;
+            document.getElementById('order-count').innerText = orderCount;
+        });
+
+        function updateSalesChart(data) {
+            const ctx = document.getElementById('salesChart').getContext('2d');
+            
+            if (salesChart) { salesChart.destroy(); }
+
+            salesChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: Object.keys(data),
+                    datasets: [{
+                        label: 'Units Sold',
+                        data: Object.values(data),
+                        backgroundColor: '#90b3fa',
+                        borderRadius: 5
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } }
+                }
+            });
+        }
+    </script>
+</body>
+</html>
